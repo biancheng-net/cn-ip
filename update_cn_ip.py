@@ -1,7 +1,6 @@
 import requests
 import math
 import os
-from github import Github
 
 def download_apnic_data():
     url = "https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest"
@@ -34,26 +33,8 @@ def process_apnic_data(data):
 
     return china_ip_allocations_ipv4, china_ip_allocations_ipv6
 
-def update_github_repo(ipv4_cidrs, ipv6_cidrs):
-    github_token = os.environ["GITHUB_TOKEN"]
-    repo_name = os.environ["GITHUB_REPOSITORY"]
-
-    g = Github(github_token)
-    repo = g.get_repo(repo_name)
-
-    content = "\n".join(ipv6_cidrs + ipv4_cidrs)
-
-    try:
-        contents = repo.get_contents("cn-ip.txt")
-        repo.update_file("cn-ip.txt", "Update China IP allocations", content, contents.sha)
-        print("Successfully updated cn-ip.txt")
-    except:
-        repo.create_file("cn-ip.txt", "Initial commit for China IP allocations", content)
-        print("Successfully created cn-ip.txt")
-
 if __name__ == "__main__":
     print("Starting job...")
     apnic_data = download_apnic_data()
     ipv4_cidrs, ipv6_cidrs = process_apnic_data(apnic_data)
-    update_github_repo(ipv4_cidrs, ipv6_cidrs)
     print("Job completed.")
