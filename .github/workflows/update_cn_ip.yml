@@ -32,23 +32,15 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update or Create Release
+      id: release
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.date.outputs.date }}
-        release_name: China IP List ${{ steps.date.outputs.date }}
+        tag_name: latest
+        name: Latest China IP List
+        body: Updated on ${{ steps.date.outputs.date }}
+        files: cn-ip.txt
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./cn-ip.txt
-        asset_name: cn-ip.txt
-        asset_content_type: text/plain
