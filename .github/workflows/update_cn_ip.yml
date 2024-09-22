@@ -2,7 +2,7 @@ name: Update China IP Allocations
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every hour 
+    - cron: "0 19 * * *"   # This is 3:00 AM Beijing time (UTC+8)
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
