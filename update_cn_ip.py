@@ -36,12 +36,9 @@ def update_github_release(ipv4_cidrs, ipv6_cidrs):
     g = Github(github_token)
     repo = g.get_repo(repo_name)
 
-    content = "# China IP Allocations\n\n"
-    content += f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC\n\n"
-    content += "## IPv4 Allocations\n\n"
+    content = ""
     for cidr in ipv4_cidrs:
         content += f"{cidr}\n"
-    content += "\n## IPv6 Allocations\n\n"
     for cidr in ipv6_cidrs:
         content += f"{cidr}\n"
 
