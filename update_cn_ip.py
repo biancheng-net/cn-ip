@@ -1,15 +1,12 @@
 import requests
 import math
 import os
-from datetime import datetime
 from github import Github
-
 
 def download_apnic_data():
     url = "https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest"
     response = requests.get(url)
     return response.text
-
 
 def process_apnic_data(data):
     china_ip_allocations_ipv4 = []
@@ -33,11 +30,9 @@ def process_apnic_data(data):
             elif resource_type == "ipv6":
                 ipv6_range = fields[3]
                 prefix_length = fields[4]
-                china_ip_allocations_ipv6.append(
-                    f"{ipv6_range}/{prefix_length}")
+                china_ip_allocations_ipv6.append(f"{ipv6_range}/{prefix_length}")
 
     return china_ip_allocations_ipv4, china_ip_allocations_ipv6
-
 
 def update_github_repo(ipv4_cidrs, ipv6_cidrs):
     github_token = os.environ["GITHUB_TOKEN"]
@@ -46,25 +41,15 @@ def update_github_repo(ipv4_cidrs, ipv6_cidrs):
     g = Github(github_token)
     repo = g.get_repo(repo_name)
 
-    content = "# China IP Allocations\n\n"
-    content += f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC\n\n"
-    content += "## IPv6 Allocations\n\n"
-    for cidr in ipv6_cidrs:
-        content += f"{cidr}\n"
-    content += "\n## IPv4 Allocations\n\n"
-    for cidr in ipv4_cidrs:
-        content += f"{cidr}\n"
+    content = "\n".join(ipv6_cidrs + ipv4_cidrs)
 
     try:
         contents = repo.get_contents("cn-ip.txt")
-        repo.update_file(
-            "cn-ip.txt", "Update China IP allocations", content, contents.sha)
+        repo.update_file("cn-ip.txt", "Update China IP allocations", content, contents.sha)
         print("Successfully updated cn-ip.txt")
     except:
-        repo.create_file(
-            "cn-ip.txt", "Initial commit for China IP allocations", content)
+        repo.create_file("cn-ip.txt", "Initial commit for China IP allocations", content)
         print("Successfully created cn-ip.txt")
-
 
 if __name__ == "__main__":
     print("Starting job...")

@@ -2,7 +2,7 @@ name: Update China IP Allocations
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every 30 minutes
+    - cron: '*/5 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -28,9 +28,27 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: python update_cn_ip.py
 
-    - name: Commit and push if changed
-      run: |
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'action@github.com'
-        git add cn-ip.txt
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update China IP allocations" && git push)
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.date.outputs.date }}
+        release_name: China IP List ${{ steps.date.outputs.date }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./cn-ip.txt
+        asset_name: cn-ip.txt
+        asset_content_type: text/plain
