@@ -27,20 +27,3 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: python update_cn_ip.py
-
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
-    - name: Update or Create Release
-      id: release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: latest
-        name: Latest China IP List
-        body: Updated on ${{ steps.date.outputs.date }}
-        files: cn-ip.txt
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
